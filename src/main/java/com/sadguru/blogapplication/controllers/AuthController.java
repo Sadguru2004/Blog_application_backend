@@ -1,8 +1,6 @@
 package com.sadguru.blogapplication.controllers;
 
-import com.sadguru.blogapplication.entities.Role;
 import com.sadguru.blogapplication.entities.User;
-import com.sadguru.blogapplication.repositories.RoleRepo;
 import com.sadguru.blogapplication.repositories.UserRepo;
 import com.sadguru.blogapplication.security.JwtHelper;
 import com.sadguru.blogapplication.payloads.JwtRequest;
@@ -14,7 +12,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,13 +29,7 @@ public class AuthController {
     private TokenBlacklist tokenBlacklist;
 
     @Autowired
-    private RoleRepo roleRepo;
-
-    @Autowired
     private UserRepo userRepo;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public JwtResponse login(@Valid  @RequestBody JwtRequest request) {
@@ -62,19 +53,6 @@ public class AuthController {
         response.setUserId(user.getId());
 
         return response;
-    }
-
-    @PostMapping("/register")
-    public User register(@RequestBody User user) {
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        Role role = roleRepo.findById(2)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-
-        user.getRoles().add(role);
-
-        return userRepo.save(user);
     }
 
     @PostMapping("/logout")
